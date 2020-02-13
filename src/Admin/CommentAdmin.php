@@ -30,6 +30,16 @@ class CommentAdmin extends AbstractAdmin
      */
     protected $commentManager;
 
+    public function setBaseRouteName($baseRouteName)
+    {
+        $this->baseRouteName = $baseRouteName;
+    }
+
+    public function setBaseRoutePattern($baseRoutePattern)
+    {
+        $this->baseRoutePattern = $baseRoutePattern;
+    }
+
     public function getBatchActions()
     {
         $actions = parent::getBatchActions();
