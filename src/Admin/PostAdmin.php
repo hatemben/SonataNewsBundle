@@ -52,6 +52,16 @@ class PostAdmin extends AbstractAdmin
      */
     protected $permalinkGenerator;
 
+    public function setBaseRouteName($baseRouteName)
+    {
+        $this->baseRouteName = $baseRouteName;
+    }
+
+    public function setBaseRoutePattern($baseRoutePattern)
+    {
+        $this->baseRoutePattern = $baseRoutePattern;
+    }
+
     /**
      * @deprecated since sonata-project/news-bundle 3.x, to be removed in 4.0.
      *
