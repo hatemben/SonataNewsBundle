@@ -3,19 +3,16 @@
     <parameters>
         <parameter key="sonata.news.manager.comment.class">Sonata\NewsBundle\Document\CommentManager</parameter>
         <parameter key="sonata.news.manager.post.class">Sonata\NewsBundle\Document\PostManager</parameter>
-        <!-- NEXT_MAJOR: Remove this keys -->
-        <parameter key="sonata.news.manager.comment.document">Application\Sonata\NewsBundle\Document\Comment</parameter>
-        <parameter key="sonata.news.manager.post.document">Application\Sonata\NewsBundle\Document\Tag</parameter>
     </parameters>
     <services>
-        <service id="sonata.news.document_manager" alias="doctrine_mongodb.odm.document_manager" public="true"/>
+        <service id="sonata.news.document_manager" alias="doctrine_mongodb.odm.default_document_manager" public="true"/>
         <service id="sonata.news.manager.comment" class="%sonata.news.manager.comment.class%" public="true">
             <argument type="service" id="sonata.news.document_manager"/>
-            <argument>%sonata.news.manager.comment.document%</argument>
+            <argument type="service" id="doctrine_mongodb"/>
         </service>
         <service id="sonata.news.manager.post" class="%sonata.news.manager.post.class%" public="true">
             <argument type="service" id="sonata.news.document_manager"/>
-            <argument>%sonata.news.manager.post.document%</argument>
+            <argument type="service" id="doctrine_mongodb"/>
         </service>
     </services>
 </container>

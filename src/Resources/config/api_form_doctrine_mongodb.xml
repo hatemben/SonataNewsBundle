@@ -6,7 +6,7 @@
             <argument type="service" id="jms_serializer.metadata_factory"/>
             <argument type="service" id="doctrine_mongodb"/>
             <argument>sonata_news_api_form_comment</argument>
-            <argument>%sonata.news.admin.comment.entity%</argument>
+            <argument>%sonata.news.admin.comment.document%</argument>
             <argument>sonata_api_write</argument>
         </service>
         <service id="sonata.news.api.form.type.post" class="Sonata\NewsBundle\Form\Type\ApiPostType">
@@ -14,7 +14,7 @@
             <argument type="service" id="jms_serializer.metadata_factory"/>
             <argument type="service" id="doctrine_mongodb"/>
             <argument>sonata_news_api_form_post</argument>
-            <argument>%sonata.news.admin.post.entity%</argument>
+            <argument>%sonata.news.admin.post.class%%</argument>
             <argument>sonata_api_write</argument>
         </service>
     </services>

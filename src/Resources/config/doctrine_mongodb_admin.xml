@@ -4,7 +4,7 @@
         <service id="sonata.news.admin.post" class="%sonata.news.admin.post.class%" public="true">
             <tag name="sonata.admin" manager_type="doctrine_mongodb" group="sonata_blog" label="posts" label_catalogue="%sonata.news.admin.post.translation_domain%" label_translator_strategy="sonata.admin.label.strategy.underscore"/>
             <argument/>
-            <argument>%sonata.news.admin.post.entity%</argument>
+            <argument>%sonata.news.admin.post.class%</argument>
             <argument>%sonata.news.admin.post.controller%</argument>
             <call method="setUserManager">
                 <argument type="service" id="fos_user.user_manager" on-invalid="null"/>
@@ -22,11 +22,17 @@
             <call method="setPermalinkGenerator">
                 <argument id="sonata.news.permalink.generator" type="service"/>
             </call>
+            <call method="setBaseRouteName">
+                <argument>news</argument>
+            </call>
+            <call method="setBaseRoutePattern">
+                <argument>news</argument>
+            </call>
         </service>
         <service id="sonata.news.admin.comment" class="%sonata.news.admin.comment.class%" public="true">
             <tag name="sonata.admin" manager_type="doctrine_mongodb" group="sonata_blog" label="comments" label_catalogue="%sonata.news.admin.comment.translation_domain%" label_translator_strategy="sonata.admin.label.strategy.underscore"/>
             <argument/>
-            <argument>%sonata.news.admin.comment.entity%</argument>
+            <argument>%sonata.news.admin.comment.class%</argument>
             <argument>%sonata.news.admin.comment.controller%</argument>
             <call method="setTranslationDomain">
                 <argument>%sonata.news.admin.comment.translation_domain%</argument>
@@ -39,6 +45,12 @@
                     <argument key="inner_list_row">@SonataNews/Admin/inner_row_comment.html.twig</argument>
                     <argument key="base_list_field">@SonataAdmin/CRUD/base_list_flat_field.html.twig</argument>
                 </argument>
+            </call>
+            <call method="setBaseRouteName">
+                <argument>news</argument>
+            </call>
+            <call method="setBaseRoutePattern">
+                <argument>news</argument>
             </call>
         </service>
     </services>
