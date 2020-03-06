@@ -33,6 +33,7 @@ use Sonata\UserBundle\Model\UserManagerInterface;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
+
 class PostAdmin extends AbstractAdmin
 {
     /**
@@ -111,7 +112,9 @@ class PostAdmin extends AbstractAdmin
             ->with('group_post', [
                     'class' => 'col-md-8',
                 ])
-                ->add('author', ModelListType::class)
+                ->add('author', ModelListType::class, [
+                    'required' => true,
+                ])
                 ->add('title')
                 ->add('abstract', TextareaType::class, [
                     'attr' => ['rows' => 5],
@@ -121,7 +124,7 @@ class PostAdmin extends AbstractAdmin
                     'format_field' => 'contentFormatter',
                     'source_field' => 'rawContent',
                     'source_field_options' => [
-                        'horizontal_input_wrapper_class' => $isHorizontal ? 'col-lg-12' : '',
+//                        'horizontal_input_wrapper_class' => $isHorizontal ? 'col-lg-12' : '',
                         'attr' => ['class' => $isHorizontal ? 'span10 col-sm-10 col-md-10' : '', 'rows' => 20],
                     ],
                     'ckeditor_context' => 'news',
