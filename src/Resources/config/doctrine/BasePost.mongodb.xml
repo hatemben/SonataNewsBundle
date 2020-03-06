@@ -13,8 +13,8 @@
         <field name="commentsCloseAt" type="date" field-name="commentsCloseAt"/>
         <field name="commentsDefaultStatus" type="int" field-name="commentsDefaultStatus"/>
         <field name="commentsCount" type="int" field-name="commentsCount"/>
-        <field name="createdAt" type="timestamp" field-name="createdAt"/>
-        <field name="updatedAt" type="timestamp" field-name="updatedAt"/>
+        <field name="createdAt" type="date" field-name="createdAt"/>
+        <field name="updatedAt" type="date" field-name="updatedAt"/>
         <lifecycle-callbacks>
             <lifecycle-callback type="prePersist" method="prePersist"/>
             <lifecycle-callback type="preUpdate" method="preUpdate"/>
