@@ -41,7 +41,7 @@ file that was distributed with this source code.
         {{ object.abstract|truncate(150) }}
 
         <br />
-        {% if object.collection %}
+        {% if object.collection.name is defined %}
             {{ object.collection.name }}
         {% endif %}
 
