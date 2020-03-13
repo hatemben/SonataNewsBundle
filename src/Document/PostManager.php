@@ -22,6 +22,8 @@ use Sonata\NewsBundle\Model\PostManagerInterface;
 
 class PostManager extends BaseDocumentManager implements PostManagerInterface
 {
+    protected $query;
+
     /**
      * @param $year
      * @param $month
@@ -42,12 +44,12 @@ class PostManager extends BaseDocumentManager implements PostManagerInterface
 
         $pdqp = $this->getPublicationDateQueryParts(sprintf('%s-%s-%s', $year, $month, $day), 'day');
 
-        return $this->getRepository()
-            ->createQueryBuilder()
+        return $this->getDocumentManager()
+            ->createQueryBuilder($this->class)
             ->field('slug')->equals($slug)
-            ->andWhere($pdqp['query'])
+            ->expr($pdqp['query'])
             ->getQuery()
-            ->getOneOrNullResult();
+            ->getSingleResult();
     }
 
     /**
@@ -57,49 +59,40 @@ class PostManager extends BaseDocumentManager implements PostManagerInterface
      */
     public function findOneByPermalink($permalink, BlogInterface $blog)
     {
-        $query = $this->getRepository()->createQueryBuilder('p');
+        $query = $this->getDocumentManager()->createQueryBuilder($this->class);
 
         try {
             $urlParameters = $blog->getPermalinkGenerator()->getParameters($permalink);
+
         } catch (\InvalidArgumentException $exception) {
             return null;
         }
-
-        $parameters = [];
-
         if (isset($urlParameters['year'], $urlParameters['month'], $urlParameters['day'])) {
-            $dateQueryParts = $this->getPublicationDateQueryParts(
-                sprintf('%d-%d-%d', $urlParameters['year'], $urlParameters['month'], $urlParameters['day']),
-                'day'
-            );
-
-            $parameters = $dateQueryParts['params'];
-
-            $query->andWhere($dateQueryParts['query']);
+            $date = sprintf('%d-%d-%d', $urlParameters['year'], $urlParameters['month'], $urlParameters['day']);
+            $query->field('publicationDateStart')->gte(new \DateTime($date))
+                ->field('publicationDateStart')->lte(new \DateTime($date.' +1 day'));
         }
 
         if (isset($urlParameters['slug'])) {
-            $query->andWhere('p.slug = :slug');
-            $parameters['slug'] = $urlParameters['slug'];
+            $query->field('slug')->equals($urlParameters['slug']);
         }
 
+        // Still missing left join part
         if (isset($urlParameters['collection'])) {
-            $collectionQueryParts = $this->getPublicationCollectionQueryParts($urlParameters['collection']);
+            /*
+            if (null === $urlParameters['collection']) {
+                $query->field('collection')->equals(null);
+            } else {
+                $query->field('slug')->in(['collection' => $urlParameters['collection']]);
 
-            $parameters = array_merge($parameters, $collectionQueryParts['params']);
+            }
 
             $query
                 ->leftJoin('p.collection', 'c')
                 ->andWhere($collectionQueryParts['query']);
+            //*/
         }
-
-        if (0 === \count($parameters)) {
-            return null;
-        }
-
-        $query->setParameters($parameters);
-
-        return $query->getQuery()->getOneOrNullResult();
+        return $query->getQuery()->getSingleResult();
     }
 
     /**
@@ -116,46 +109,41 @@ class PostManager extends BaseDocumentManager implements PostManagerInterface
         if (!isset($criteria['mode'])) {
             $criteria['mode'] = 'public';
         }
-
         $parameters = [];
-        $query = $this->getRepository()
-            ->createQueryBuilder('p')
-            ->select('p, t')
-            ->leftJoin('p.tags', 't')
-            ->orderBy('p.publicationDateStart', 'DESC');
+        $query = $this->getDocumentManager()->createQueryBuilder($this->class);
+        $query
+            ->field('tags')
+            ->sort('publicationDateStart','DESC');
+
 
         if (!isset($criteria['enabled']) && 'public' === $criteria['mode']) {
             $criteria['enabled'] = true;
         }
         if (isset($criteria['enabled'])) {
-            $query->andWhere('p.enabled = :enabled');
-            $parameters['enabled'] = $criteria['enabled'];
+            $query->field('enabled')->equals($criteria['enabled']);
         }
 
         if (isset($criteria['date'], $criteria['date']['query'], $criteria['date']['params'])) {
-            $query->andWhere($criteria['date']['query']);
-            $parameters = array_merge($parameters, $criteria['date']['params']);
+            $query->field($criteria['date']['query'])->equals($criteria['date']['params']);
+          //  $parameters = array_merge($parameters, $criteria['date']['params']);
         }
 
         if (isset($criteria['tag'])) {
-            $query->andWhere('t.slug LIKE :tag');
-            $parameters['tag'] = (string) $criteria['tag'];
+            $query->field('slug')->equals($criteria['tag']);
         }
 
         if (isset($criteria['author'])) {
             if (!\is_array($criteria['author']) && stristr($criteria['author'], 'NULL')) {
-                $query->andWhere('p.author IS '.$criteria['author']);
+                $query->field('author')->equals($criteria['author']);
             } else {
-                $query->andWhere(sprintf('p.author IN (%s)', implode(',', (array) $criteria['author'])));
+                $query->field('author')->in((array) $criteria['author']);
             }
         }
 
         if (isset($criteria['collection']) && $criteria['collection'] instanceof CollectionInterface) {
-            $query->andWhere('p.collection = :collectionid');
-            $parameters['collectionid'] = $criteria['collection']->getId();
+            $query->field('collection')->equals($criteria['collection']->getId());
         }
 
-        $query->setParameters($parameters);
 
         $pager = new Pager();
         $pager->setMaxPerPage($limit);
